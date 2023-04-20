@@ -1,6 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
-class Animal
+public class Animal
 {
 
     public string Nickname { get; set; }
@@ -23,7 +25,7 @@ class Animal
     //Methods
     public void Eat()
     {
-        Energy += MaxEnergy/2;
+        Energy += MaxEnergy / 2;
         Price += Price / 3;
         if (Energy > MaxEnergy)
         {
@@ -39,7 +41,7 @@ class Animal
     }
     public void Play()
     {
-        if (Energy >= 10) Energy -= MaxEnergy/10;
+        if (Energy >= 10) Energy -= MaxEnergy / 10;
         else Console.WriteLine($"{Nickname}({GetType()}) out of energy shes need to sleep or eating");
         Console.WriteLine($"\n{Nickname}({GetType()}) is playing,Energy lost.Energy now {Energy}\n");
         if (Energy < 0 || Energy == 0)
@@ -48,11 +50,15 @@ class Animal
             Sleep();
         }
     }
+    public override string ToString()
+    {
+        return $"\nType:{GetType()}\nNickname:{Nickname}\nGender:{Gender}\nAge:{Age}\nCurrent energy:{Energy}\nMax energy:{MaxEnergy}\nPrice:{Price}\nMeal quantity:{MealQuantity} kg\n";
+    }
 
     public virtual void Noise() { }
 }
 
-class Dog : Animal
+public class Dog : Animal
 {
     public Dog(string nickname, string gender, int age, int energy, float price, float mealQuantity) : base(nickname, gender, age, energy, price, mealQuantity) { }
     public override void Noise()
@@ -60,7 +66,7 @@ class Dog : Animal
         Console.WriteLine($"{GetType()}: bark-bark");
     }
 }
-class Cat : Animal
+public class Cat : Animal
 {
     public Cat(string nickname, string gender, int age, int energy, float price, float mealQuantity) : base(nickname, gender, age, energy, price, mealQuantity) { }
     public override void Noise()
@@ -68,7 +74,7 @@ class Cat : Animal
         Console.WriteLine($"{GetType()}: meow!");
     }
 }
-class Bird : Animal
+public class Bird : Animal
 {
     public Bird(string nickname, string gender, int age, int energy, float price, float mealQuantity) : base(nickname, gender, age, energy, price, mealQuantity) { }
 
@@ -77,7 +83,7 @@ class Bird : Animal
         Console.WriteLine($"{GetType()}: cik-cik");
     }
 }
-class Fish : Animal
+public class Fish : Animal
 {
     public Fish(string nickname, string gender, int age, int energy, float price, float mealQuantity) : base(nickname, gender, age, energy, price, mealQuantity) { }
 
@@ -86,24 +92,101 @@ class Fish : Animal
         Console.WriteLine($"{GetType()}: Bul-bul");
     }
 }
+
+public class Petshop
+{
+    private Animal[] pets = new Animal[0];
+    public Animal this[int index]
+    {
+        get { return pets[index]; }
+        set { pets[index] = value; }
+    }
+    public Animal[] Pets
+    {
+        get { return pets; }
+        set { pets = value; }
+    }
+
+
+    //overloading
+    public void AddNewPet(Cat catObject)
+    {
+        Array.Resize(ref pets, pets.GetLength(0) + 1);
+        pets[pets.GetLength(0) - 1] = catObject;
+    }
+    public void AddNewPet(Dog catObject)
+    {
+        Array.Resize(ref pets, pets.GetLength(0) + 1);
+        pets[pets.GetLength(0) - 1] = catObject;
+    }
+    public void AddNewPet(Bird catObject)
+    {
+        Array.Resize(ref pets, pets.GetLength(0) + 1);
+        pets[pets.GetLength(0) - 1] = catObject;
+    }
+    public void AddNewPet(Fish catObject)
+    {
+        Array.Resize(ref pets, pets.GetLength(0) + 1);
+        pets[pets.GetLength(0) - 1] = catObject;
+    }
+
+    public int FindByNickname(string nickname)
+    {
+        for (int i = 0; i < pets.GetLength(0); i++)
+        {
+            if (pets[i].Nickname == nickname)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public void RemoveByNickname(string nickname)
+    {
+        int IndexofNickname = FindByNickname(nickname);
+        if (IndexofNickname > -1)
+        {
+            Animal[] temp = new Animal[pets.GetLength(0) - 1];
+            for (int i = 0; i < IndexofNickname; i++)
+            {
+                temp[i] = pets[i];
+            }
+            for (int i = IndexofNickname; i < pets.GetLength(0) - 1; i++)
+            {
+                temp[i] = pets[i + 1];
+            }
+            //Array.Clear(pets);
+            pets = temp;
+            
+
+        }
+        else Console.WriteLine("Pet did not found!");
+    }
+
+}
 internal class program
 {
     static void Main(string[] args)
     {
-        Dog dog1 = new("Lesi", "Female", 5, 500, 450f, 60);
-        dog1.Noise();
-        dog1.Play();
-        dog1.Play();
-        dog1.Sleep();
+        //dog1.Noise();
+        //dog1.Play();
+        //dog1.Play();
+        //dog1.Sleep();
+        Cat cat1 = new("Pesi", "Female", 5, 100, 250f, 60);
+        Dog dog1 = new("Lessy", "Female", 5, 500, 450f, 60);
+        Bird Bird1 = new("Woody", "Female", 5, 55, 250f, 60);
+        Fish Fish1 = new("Nemo", "Male", 5, 22, 150f, 60);
+        Petshop shop = new Petshop();
 
-        Cat cat1 = new("Pesi", "Female", 5, 100, 450f, 60);
-        cat1.Noise();
-        
-        Bird Bird1 = new("Woody", "Female", 5, 55, 450f, 60);
-        Bird1.Noise();
+        shop.AddNewPet(cat1);
+        shop.AddNewPet(dog1);
+        shop.AddNewPet(Bird1);
+        shop.AddNewPet(Fish1);
+        shop.RemoveByNickname("Lessy");
+        shop.RemoveByNickname("Woody");
+        shop.RemoveByNickname("Nemo");
 
-        Fish Fish1 = new("Nemo", "Male", 5, 22, 450f, 60);
-        Fish1.Noise();
     }
 
 }
+
